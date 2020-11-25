@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
-
+use Laravel\Passport\Client as OClient; 
 
 
 class AuthController extends Controller
@@ -66,6 +66,7 @@ class AuthController extends Controller
             $response = json_encode([
                 'status' => env('CD_SUCCESS'),
                 'message' => env('MSG_OK'),
+                'token_type' =>'Bearer',
                 'access_token' => $token
             ]);
 
@@ -74,6 +75,12 @@ class AuthController extends Controller
         } else {
             return response()->json([env('MSG_ERRORS')=>env('')], 401);
         }
+
+    }
+
+
+    public function getTokenAndRefreshToken(OClient $oClient, $creds) {
+        $oClient = OClient::where('password_client', 1)->first();
 
     }
 
