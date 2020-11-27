@@ -88,11 +88,25 @@ class AuthController extends Controller
     }
 
 
-    public function getTokenAndRefreshToken(OClient $oClient, $email) {
-        $oClient = OClient::where('password_client', 1)->first();
-
+    public function logout(Request $request) {
+        print_r("LOGGING OUT \n\n");
+        $request->user()->token()->revoke();
+        return response()->json([
+            'status' => $this->successStatus,
+            'message' => 'Successfully logged out'
+        ]);
     }
 
+
+    public function userProfile(Request $request) {
+        print_r("GET CURRENT USER PROFILE \n\n");
+
+        return response()->json([
+            'status' => $this->successStatus,
+            'message' => 'SUCCESS',
+            'user' => $request->user()
+        ]);
+    }
 
 
 }
