@@ -7,13 +7,13 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
-use GuzzleHttp\Client;
 use Laravel\Passport\Client as OClient; 
+
 
 class AuthController extends Controller
 {
 
-    public $successStatus = 200;
+
     public function register(Request $request) {
 
         print_r("REGISTER USER AT AUTH CONTROLLER \n\n");
@@ -48,9 +48,7 @@ class AuthController extends Controller
     }
 
 
-    /*
-        ATTENTION: PLEASE SERVE IN TWO PORTS TO BE ABLE TO USE HTTP GUZZLE  
-    */
+
     public function login(Request $request) {
 
         print_r("LOGIN USER AT AUTH CONTROLLER \n\n");
@@ -63,23 +61,16 @@ class AuthController extends Controller
 
             $user = Auth::user();
 
-            $oClient = OClient::where('password_client', 1)->first();
+            $token = $user->createToken('access')->accessToken;
 
-            $http = new Client;
-            $response = $http->request('POST', env('URL_AUTH_TOKEN'), [
-                'form_params' => [
-                    'grant_type' => 'password',
-                    'client_id' => $oClient->id,
-                    'client_secret' => $oClient->secret,
-                    'username' => $user['email'], # I KNOW THIS IS WEIRD, BUT IT;S TRUE!
-                    'password' => $creds['password'], # MUST USE UNHASHED
-                    'scope' => '*',
-                ],
+            $response = json_encode([
+                'status' => env('CD_SUCCESS'),
+                'message' => env('MSG_OK'),
+                'token_type' =>'Bearer',
+                'access_token' => $token
             ]);
 
-            $result = json_decode((string) $response->getBody(), true);
-            return response()->json($result, $this->successStatus);
-
+            return $response;
 
         } else {
             return response()->json([env('MSG_ERRORS')=>env('')], 401);
@@ -88,7 +79,7 @@ class AuthController extends Controller
     }
 
 
-    public function getTokenAndRefreshToken(OClient $oClient, $email) {
+    public function getTokenAndRefreshToken(OClient $oClient, $creds) {
         $oClient = OClient::where('password_client', 1)->first();
 
     }
